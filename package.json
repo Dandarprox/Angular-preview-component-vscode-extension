@@ -1,7 +1,11 @@
 {
-	"name": "tidy-comments",
-	"displayName": "Tidy comments",
-	"description": "Improves order in your comments",
+	"name": "ng-prev-component",
+	"author": {
+		"name": "Daniel Rodriguez",
+		"email": "daerodriguezme@unal.edu.co"
+	},
+	"displayName": "Angular preview component",
+	"description": "Open dependencies of a component given one of the base component files.",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.36.0"
@@ -10,14 +14,14 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.tidyComments"
+		"onCommand:extension.ngPrevComponent"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.tidyComments",
-				"title": "Tidy comments"
+				"command": "extension.ngPrevComponent",
+				"title": "Angular preview component"
 			}
 		]
 	},

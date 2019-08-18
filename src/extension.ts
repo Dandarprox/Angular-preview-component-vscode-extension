@@ -2,6 +2,10 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
+interface UserConfiguration {
+	openInColumn: boolean,
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function insertAtPos(baseStr: string, extraStr: string, position: number) {
@@ -18,54 +22,75 @@ export function activate(context: vscode.ExtensionContext) {
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('extension.tidyComments', () => {
+	let disposable = vscode.commands.registerCommand('extension.ngPrevComponent', () => {
 		// The code you place here will be executed every time your command is executed
 
 		// Display a message box to the user
-		vscode.window.showInformationMessage('Running TIDY COMMENTS');
-		const TAB_DISTANCE = 5;		
+		vscode.window.showInformationMessage('Running Angular preview component');
 		let lang = vscode.window.activeTextEditor!.document.languageId;
-		let checkLanguages = ['html', 'javascript', 'typescript', 'scss', 'sass', 'css'];
+		const checkLanguages = [
+			'html', 
+			'typescript', 
+			'scss', 
+			'sass', 
+			'css'
+		]
+		const checkExtensions = ['html', 'ts', 'scss', 'sass', 'css'];	
+		let configurations: UserConfiguration = vscode.workspace.getConfiguration('ng-prev-component') as any;
 
+		if (checkLanguages.some(clang => clang == lang)) {
+			vscode.window.showInformationMessage('Looking for files...');
 
-		if (lang == 'typescript' || lang == 'javascript') {
+			let activeFile = vscode.window.activeTextEditor;
 			
-			let selection = vscode.window.activeTextEditor!.selection;
-			let posStart = new vscode.Position(selection.start.line, 0);
-			let lastLineLength =  vscode.window.activeTextEditor!.document.lineAt(selection.end.line).text.length;
-			let posEnd = new vscode.Position(selection.end.line, lastLineLength);
-			let selectionRange = new vscode.Range(posStart, posEnd);
-
-			let selectedText = vscode.window.activeTextEditor!.document.getText(selectionRange);
-
-			if (selectedText.length !== 0) {
-				let splittedText = selectedText.split('\n');
-				let maxSpacing = 0;
+			if (activeFile) {
+				let fileURI = (activeFile as vscode.TextEditor).document.uri;
+				let workspaceFsPath = vscode.workspace.getWorkspaceFolder(fileURI)!.uri.path.toLowerCase();
 				
-				splittedText.forEach(str => {
-					maxSpacing = str.length > maxSpacing ? str.length : maxSpacing;
-				});
+				const FileRegex = /([a-z|\-]+)\.component\.([a-z]+)$/gi;
+				let file = FileRegex.exec(activeFile.document.fileName)!;
+				let fileName = file[1];
+				let fileExtension = file[2];
 
-				console.log("Line: ", selection.start.line);
-				console.log("Text: ", selectedText);
-				console.log("Max is", maxSpacing);
-				vscode.window.activeTextEditor!.edit((editBuilder: vscode.TextEditorEdit) => {
-					for (let i = 0; i < splittedText.length; i++) {
-						splittedText[i] = splittedText	[i].replace(/[\n\r]+/g, '');
-						splittedText[i] = splittedText[i].trim();
+				console.log(fileName, fileExtension, workspaceFsPath);
 
-						console.log("SOCCC", splittedText[i].length );
-						let dist = maxSpacing - splittedText[i].length + TAB_DISTANCE;		
+				let searchGlobPattern = '{';
+				checkExtensions.forEach((ext, index) => {
+					if (fileExtension == ext) return;
+					searchGlobPattern += `**/${fileName}.component.${ext}`;
 
-						editBuilder.insert(new vscode.Position(posStart.line + i, maxSpacing + TAB_DISTANCE), 
-							' '.repeat(dist) + '// Comment');
+					if (index + 1 != checkExtensions.length) {
+						searchGlobPattern += ',';
 					}
 				});
+				searchGlobPattern += '}';
+				
+				vscode.workspace.findFiles(searchGlobPattern, '**​/node_modules/**')
+					.then(uris => {
+						if (uris.length == 0) vscode.window.showInformationMessage('FILES not found')
 
+						uris.forEach(uri => {
+							if (uri.path.toLowerCase().includes(workspaceFsPath)) {
+								
+								vscode.workspace.openTextDocument(uri)
+									.then(doc => {
+										let showMethod: vscode.TextDocumentShowOptions = {
+											preview: false
+										};
 
+										if (configurations && configurations.openInColumn) showMethod.viewColumn = vscode.ViewColumn.Beside;
+										vscode.window.showTextDocument(doc, showMethod);
+									});
+
+							}
+						});
+
+					});
 			}
+		} else {
+			vscode.window.showInformationMessage('Current file is not valid');
 		}
-
+		
 	});
 
 	context.subscriptions.push(disposable);
