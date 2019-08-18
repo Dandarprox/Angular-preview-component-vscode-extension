@@ -4,6 +4,8 @@
 		"name": "Daniel Rodriguez",
 		"email": "daerodriguezme@unal.edu.co"
 	},
+	"icon": "icon.png",
+	"publisher": "daniel-rodriguez",
 	"displayName": "Angular preview component",
 	"description": "Open dependencies of a component given one of the base component files.",
 	"version": "0.0.1",
@@ -14,7 +16,12 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.ngPrevComponent"
+		"onCommand:extension.ngPrevComponent",
+		"onLanguage:html",
+		"onLanguage:ts",
+		"onLanguage:css",
+		"onLanguage:scss",
+		"onLanguage:sass"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -23,14 +30,33 @@
 				"command": "extension.ngPrevComponent",
 				"title": "Angular preview component"
 			}
-		]
+		],
+		"configuration": 	{
+			"title": "Angular preview component",
+			"properties": {
+				"ng-prev-component.openInColumn": {
+					"type": "boolean",
+					"description": "Whether the files will open in new columns",
+					"default": true
+				}
+			}
+		}
 	},
+	"galleryBanner": {
+		"color": "#7d011f",
+		"theme": "dark"
+	},
+	"homepage": "https://github.com/Dandarprox/Angular-preview-component-vscode-extension",
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"pretest": "npm run compile",
 		"test": "node ./out/test/runTest.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Dandarprox/Angular-preview-component-vscode-extension"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.1",
