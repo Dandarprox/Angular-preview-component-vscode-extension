@@ -8,7 +8,7 @@
 	"publisher": "daniel-rodriguez",
 	"displayName": "Angular preview component",
 	"description": "Open dependencies of a component given one of the base component files.",
-	"version": "0.0.1",
+	"version": "1.0.1",
 	"engines": {
 		"vscode": "^1.36.0"
 	},
@@ -31,7 +31,7 @@
 				"title": "Angular preview component"
 			}
 		],
-		"configuration": 	{
+		"configuration": {
 			"title": "Angular preview component",
 			"properties": {
 				"ng-prev-component.openInColumn": {
